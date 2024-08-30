@@ -1,3 +1,21 @@
+/* Additional CSS for transition effect */
+@keyframes slideIn {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.message {
+    animation: slideIn 0.5s ease-in-out;
+}
+
+/* Rest of your CSS */
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -14,6 +32,15 @@ body {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+}
+
+.header {
+    background-color: #ffb6e2;
+    color: #000;
+    text-align: center;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: bold;
 }
 
 .chat-box {
@@ -47,6 +74,22 @@ body {
     color: black;
 }
 
+.message-label {
+    font-size: 12px;
+    margin-bottom: 2px;
+    font-weight: bold;
+}
+
+.user-label {
+    align-self: flex-end;
+    color: #ff1493;
+}
+
+.bot-label {
+    align-self: flex-start;
+    color: #000;
+}
+
 #user-input {
     width: 80%;
     padding: 15px;
@@ -69,4 +112,25 @@ body {
     background-color: #ffb6e2;
 }
 
-.chatInput{display: flex;}
+.chatInput {
+    display: flex;
+}
+
+.chat-box::-webkit-scrollbar {
+    width: 3px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background: #ffb6e2;
+    border-radius: 10px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    background: rgba(220, 20, 60, .1);
+}
+
+a {
+    color: #000;
+    font-size: 14px;
+    text-decoration: none;
+}
