@@ -91,7 +91,7 @@ body {
 }
 
 #user-input {
-    width: 80%;
+    width: 70%;
     padding: 15px;
     border: none;
     border-top: 1px solid #ddd;
@@ -114,6 +114,7 @@ body {
 
 .chatInput {
     display: flex;
+    position: relative;
 }
 
 .chat-box::-webkit-scrollbar {
@@ -133,4 +134,52 @@ a {
     color: #000;
     font-size: 14px;
     text-decoration: none;
+}
+
+/* Hamburger Menu CSS */
+.menu {
+    position: relative;
+}
+
+#menu-btn {
+    padding: 15px;
+    background-color: #ffb6e2;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    width: auto;
+}
+
+#menu-btn:hover {
+    background-color: #ffb6e2;
+}
+
+.menu-content {
+    display: none;
+    position: absolute;
+    top: -76px;
+    left: 0;
+    background-color: rgb(228, 228, 228);
+    z-index: 1;
+    overflow: hidden;
+    width: 400px;
+}
+
+.menu-content .menu-item {
+    padding: 10px 15px;
+    background-color: #ffe4f4;
+    color: black;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.menu-content .menu-item:hover {
+    background-color: #f1f1f1;
+}
+
+/* Ensure the menu content shows when the parent has the 'show' class */
+.menu.show .menu-content {
+    display: block;
 }
