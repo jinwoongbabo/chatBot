@@ -123,9 +123,17 @@ document.querySelectorAll('.menu-item').forEach(button => {
         } else {
             const userInput = document.getElementById('user-input');
             userInput.value = this.getAttribute('data-text');
-            sendMessage();
+            sendMessage(); // Send the message automatically
         }
     });
+});
+
+// Adding event listeners for the send button and "Enter" key
+document.getElementById('send-btn').addEventListener('click', sendMessage);
+document.getElementById('user-input').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
 });
 
 function sendMessage() {
@@ -143,6 +151,7 @@ function sendMessage() {
         }, 1000);
     }
 }
+
 function displayMessage(message, isUser = false) {
     const chatLog = document.getElementById('chat-log');
     
