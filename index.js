@@ -1,6 +1,84 @@
-function fetchRandomYouTubeSong(callback) {
+function fetchSeoulWeather(callback, temperatureOnly = false) {
+    const apiKey = '1e5c0425d7d6ddc50ad6768bbca7709a';
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=Seoul&appid=${apiKey}&units=metric`;
+
+    const weatherTranslations = {
+        "clear sky": "맑은",
+        "few clouds": "구름 조금",
+        "scattered clouds": "흩어진 구름",
+        "broken clouds": "조각 구름",
+        "shower rain": "소나기",
+        "rain": "비",
+        "thunderstorm": "천둥번개",
+        "snow": "눈",
+        "mist": "안개",
+    };
+    const weatherTranslations2 = {
+        "clear sky": "🌞",
+        "few clouds": "🌤️",
+        "scattered clouds": "☁️",
+        "broken clouds": "☁️",
+        "shower rain": "🌧️",
+        "rain": "☔",
+        "thunderstorm": "⛈️",
+        "snow": "❄️",
+        "mist": "🌫️",
+    };
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const weatherDescriptionEnglish = data.weather[0].description;
+            const weatherDescription = weatherTranslations[weatherDescriptionEnglish] || weatherDescriptionEnglish;
+            const weatherEmoji = weatherTranslations2[weatherDescriptionEnglish] || '';
+            const temperature = data.main.temp;
+
+            const weatherMessage = `현재 서울의 날씨는 ${weatherDescription}, 온도는 ${temperature}°C 입니다.`;
+
+            const headerWeatherSpan = document.querySelector('.header span');
+            headerWeatherSpan.textContent = `${weatherEmoji}`;
+            headerWeatherSpan.dataset.weather = weatherDescriptionEnglish;
+
+            if (callback) {
+                if (temperatureOnly) {
+                    callback(`현재 서울의 온도는 ${temperature}°C 입니다.`);
+                } else {
+                    callback(weatherMessage);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching the weather data:', error);
+            if (callback) {
+                callback("날씨 정보를 가져오는데 실패했습니다. 다시 시도해주세요.");
+            }
+        });
+}
+
+fetchSeoulWeather();
+
+function fetchRandomYouTubeSong(callback, useWeatherBasedQuery = false) {
+    const headerWeatherSpan = document.querySelector('.header span');
+    const currentWeather = headerWeatherSpan.dataset.weather;
+
+    let searchQuery = '쏘플';
+
+    if (useWeatherBasedQuery && currentWeather) {
+        const weatherToMusic = {
+            "clear sky": "맑은 날씨에 어울리는 노래",
+            "few clouds": "구름 조금 있을 때 듣기 좋은 노래",
+            "scattered clouds": "흩어진 구름과 어울리는 노래",
+            "broken clouds": "조각 구름과 어울리는 노래",
+            "shower rain": "소나기에 어울리는 노래",
+            "rain": "비오는 날에 어울리는 노래",
+            "thunderstorm": "천둥번개 칠 때 듣기 좋은 노래",
+            "snow": "눈 오는 날에 어울리는 노래",
+            "mist": "안개 낀 날에 어울리는 노래",
+        };
+        searchQuery = weatherToMusic[currentWeather] || searchQuery;
+    }
+
     const apiKey = 'AIzaSyAAoLK2aGtnwLl46EeJBzCtfIdxnuDSWh0';
-    const searchQuery = '쏘플';
     const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=${encodeURIComponent(searchQuery)}&type=video&videoEmbeddable=true&key=${apiKey}`;
 
     fetch(apiUrl)
@@ -29,76 +107,25 @@ function fetchRandomYouTubeSong(callback) {
             callback("노래 정보를 가져오는데 실패했습니다. 다시 시도해주세요.");
         });
 }
-function fetchSeoulWeather(callback, temperatureOnly = false) {
-    const apiKey = '1e5c0425d7d6ddc50ad6768bbca7709a';
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=Seoul&appid=${apiKey}&units=metric`;
 
-    const weatherTranslations = {
-        "clear sky": "맑은",
-        "few clouds": "구름 조금",
-        "scattered clouds": "흩어진 구름",
-        "broken clouds": "조각 구름",
-        "shower rain": "소나기",
-        "rain": "비",
-        "thunderstorm": "천둥번개",
-        "snow": "눈",
-        "mist": "안개",
-    };
+document.getElementById('menu-btn').addEventListener('click', function() {
+    const menu = document.querySelector('.menu');
+    menu.classList.toggle('show');
+});
 
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            const weatherDescriptionEnglish = data.weather[0].description;
-            const weatherDescription = weatherTranslations[weatherDescriptionEnglish] || weatherDescriptionEnglish;
-            const temperature = data.main.temp;
+document.querySelectorAll('.menu-item').forEach(button => {
+    button.addEventListener('click', function() {
+        const menu = document.querySelector('.menu');
+        menu.classList.remove('show');
 
-            let weatherMessage;
-            if (temperatureOnly) {
-                weatherMessage = `현재 서울의 온도는 ${temperature}°C 입니다.`;
-            } else {
-                weatherMessage = `현재 서울의 날씨는 ${weatherDescription}, 온도는 ${temperature}°C 입니다.`;
-            }
-            
-            callback(weatherMessage);
-        })
-        .catch(error => {
-            console.error('Error fetching the weather data:', error);
-            callback("날씨 정보를 가져오는데 실패했습니다. 다시 시도해주세요.");
-        });
-}
-
-function fetchSeoulTime(callback) {
-    const now = new Date();
-    const seoulTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (9 * 60 * 60000)); 
-
-    const hours = seoulTime.getHours();
-    const minutes = seoulTime.getMinutes();
-    const timeMessage = `현재 시간은 ${hours}시 ${minutes}분 입니다.`;
-    
-    callback(timeMessage);
-}
-
-function displayMessage(message, isUser = false) {
-    const chatLog = document.getElementById('chat-log');
-    
-    const messageLabel = document.createElement('div');
-    messageLabel.className = isUser ? 'message-label user-label' : 'message-label bot-label';
-    messageLabel.textContent = isUser ? 'me' : '도희🎀';
-    
-    const messageElement = document.createElement('div');
-    messageElement.className = isUser ? 'message user-message' : 'message bot-message';
-    messageElement.innerHTML = message;
-
-    chatLog.appendChild(messageLabel);
-    chatLog.appendChild(messageElement);
-
-    scrollToBottom();
-}
-document.getElementById('send-btn').addEventListener('click', sendMessage);
-document.getElementById('user-input').addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        sendMessage();
-    }
+        if (this.getAttribute('data-text') === "현재 날씨에 따른 노래 추천받기") {
+            fetchRandomYouTubeSong(displayMessage, true);
+        } else {
+            const userInput = document.getElementById('user-input');
+            userInput.value = this.getAttribute('data-text');
+            sendMessage();
+        }
+    });
 });
 
 function sendMessage() {
@@ -116,6 +143,23 @@ function sendMessage() {
         }, 1000);
     }
 }
+function displayMessage(message, isUser = false) {
+    const chatLog = document.getElementById('chat-log');
+    
+    const messageLabel = document.createElement('div');
+    messageLabel.className = isUser ? 'message-label user-label' : 'message-label bot-label';
+    messageLabel.textContent = isUser ? 'me' : '도희🎀';
+    
+    const messageElement = document.createElement('div');
+    messageElement.className = isUser ? 'message user-message' : 'message bot-message';
+    messageElement.innerHTML = message;
+
+    chatLog.appendChild(messageLabel);
+    chatLog.appendChild(messageElement);
+
+    scrollToBottom();
+}
+
 function scrollToBottom() {
     const chatBox = document.querySelector('.chat-box');
     chatBox.scrollTop = chatBox.scrollHeight;
