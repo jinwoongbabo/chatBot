@@ -9,14 +9,22 @@
 </head>
 <body>
     <div class="chat-container">
-        <div class="header">도희봇이랑 이야기하기</div> 
+        <div class="header">현재날씨: <span></span></div> 
         <div class="chat-box" id="chat-box">
             <div class="chat-log" id="chat-log"></div>
         </div>
         <div class="chatInput">
+            <div class="menu">
+                <button id="menu-btn">☰</button>
+                <div class="menu-content">
+                    <button class="menu-item" data-text="현재 날씨에 따른 노래 추천받기">현재 날씨에 따른 노래 추천받기</button>
+                    <button class="menu-item" data-text="바보">바보</button>
+                </div>
+            </div>
             <input type="text" id="user-input" placeholder="메시지를 입력해 주세요" />
             <button id="send-btn">전송</button>
         </div>
+        
     </div>
     <script src="index.js"></script>
 </body>
