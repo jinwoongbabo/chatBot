@@ -1,3 +1,99 @@
+function fetchRandomYouTubeSong(callback) {
+    const apiKey = 'AIzaSyAAoLK2aGtnwLl46EeJBzCtfIdxnuDSWh0';
+    const searchQuery = '쏘플';
+    const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=${encodeURIComponent(searchQuery)}&type=video&videoEmbeddable=true&key=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.items && data.items.length > 0) {
+                const randomIndex = Math.floor(Math.random() * data.items.length);
+                const videoId = data.items[randomIndex].id.videoId;
+                const videoTitle = data.items[randomIndex].snippet.title;
+                const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+                
+                const message = `
+                    이 노래는 어떠세요?<br> ${videoTitle}<br>
+                    <a href="${videoUrl}" target="_blank">☞ 클릭 하면 유튜브 채널로 이동 합니다</a><br>
+                    <iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" 
+                    frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                `;
+                
+                callback(message);
+            } else {
+                callback("노래를 찾을 수 없었어요. 다시 시도해 주세요.");
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching the YouTube data:', error);
+            callback("노래 정보를 가져오는데 실패했습니다. 다시 시도해주세요.");
+        });
+}
+function fetchSeoulWeather(callback, temperatureOnly = false) {
+    const apiKey = '1e5c0425d7d6ddc50ad6768bbca7709a';
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=Seoul&appid=${apiKey}&units=metric`;
+
+    const weatherTranslations = {
+        "clear sky": "맑은",
+        "few clouds": "구름 조금",
+        "scattered clouds": "흩어진 구름",
+        "broken clouds": "조각 구름",
+        "shower rain": "소나기",
+        "rain": "비",
+        "thunderstorm": "천둥번개",
+        "snow": "눈",
+        "mist": "안개",
+    };
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const weatherDescriptionEnglish = data.weather[0].description;
+            const weatherDescription = weatherTranslations[weatherDescriptionEnglish] || weatherDescriptionEnglish;
+            const temperature = data.main.temp;
+
+            let weatherMessage;
+            if (temperatureOnly) {
+                weatherMessage = `현재 서울의 온도는 ${temperature}°C 입니다.`;
+            } else {
+                weatherMessage = `현재 서울의 날씨는 ${weatherDescription}, 온도는 ${temperature}°C 입니다.`;
+            }
+            
+            callback(weatherMessage);
+        })
+        .catch(error => {
+            console.error('Error fetching the weather data:', error);
+            callback("날씨 정보를 가져오는데 실패했습니다. 다시 시도해주세요.");
+        });
+}
+
+function fetchSeoulTime(callback) {
+    const now = new Date();
+    const seoulTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (9 * 60 * 60000)); 
+
+    const hours = seoulTime.getHours();
+    const minutes = seoulTime.getMinutes();
+    const timeMessage = `현재 시간은 ${hours}시 ${minutes}분 입니다.`;
+    
+    callback(timeMessage);
+}
+
+function displayMessage(message, isUser = false) {
+    const chatLog = document.getElementById('chat-log');
+    
+    const messageLabel = document.createElement('div');
+    messageLabel.className = isUser ? 'message-label user-label' : 'message-label bot-label';
+    messageLabel.textContent = isUser ? 'me' : '도희🎀';
+    
+    const messageElement = document.createElement('div');
+    messageElement.className = isUser ? 'message user-message' : 'message bot-message';
+    messageElement.innerHTML = message;
+
+    chatLog.appendChild(messageLabel);
+    chatLog.appendChild(messageElement);
+
+    scrollToBottom();
+}
 document.getElementById('send-btn').addEventListener('click', sendMessage);
 document.getElementById('user-input').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
@@ -10,29 +106,16 @@ function sendMessage() {
     const chatLog = document.getElementById('chat-log');
 
     if (userInput.value.trim() !== '') {
-        const userMessage = document.createElement('div');
-        userMessage.className = 'message user-message';
-        userMessage.textContent = userInput.value;
-        chatLog.appendChild(userMessage);
-
-        // Scroll to the bottom after user message
-        scrollToBottom();
-
+        displayMessage(userInput.value, true); 
+        
         const userMessageText = userInput.value.trim();
         userInput.value = '';
 
-        setTimeout(() => {
-            const botMessage = document.createElement('div');
-            botMessage.className = 'message bot-message';
-            botMessage.textContent = generateBotResponse(userMessageText);
-            chatLog.appendChild(botMessage);
-
-            // Scroll to the bottom after bot message
-            scrollToBottom();
-        }, 500);
+        setTimeout(function() {
+            generateBotResponse(userMessageText);
+        }, 1000);
     }
 }
-
 function scrollToBottom() {
     const chatBox = document.querySelector('.chat-box');
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -48,8 +131,28 @@ function generateBotResponse(userMessage) {
         "도희": "걔 공주잖아",
         "진웅": "완전 잘생긴 왕자잖아.",
         "진하": "그 왕자의 동생... 신이 되고 싶어서 자꾸 하늘에 서려고 하지",
-        "민지": "완전 바보 ㅋㅋ",
-        "엔트위즈": "아직도 4대 보험 안 냈대?",
+        "민지": "맨날 리썰 하자고 하는 바보임",
+        "오늘 몇 도야": function(callback) {
+            fetchSeoulWeather(callback, true);
+        },
+        "날씨": function(callback) {
+            fetchSeoulWeather(callback, false); 
+        },
+        "온도": function(callback) {
+            fetchSeoulWeather(callback, true);
+        },
+        "몇 시야": function(callback) {
+            fetchSeoulTime(callback);
+        },
+        "시간": function(callback) {
+            fetchSeoulTime(callback);
+        },
+        "노래 추천": function(callback) {
+            fetchRandomYouTubeSong(callback);
+        },
+        "노래": function(callback) {
+            fetchRandomYouTubeSong(callback);
+        },
     };
 
     const learnedResponses = JSON.parse(localStorage.getItem('learnedResponses')) || {};
@@ -64,7 +167,12 @@ function generateBotResponse(userMessage) {
 
     for (let key in responses) {
         if (userMessage.includes(key)) {
-            finalResponse = responses[key];
+            if (typeof responses[key] === 'function') {
+                responses[key](displayMessage);
+                return; 
+            } else {
+                finalResponse = responses[key];
+            }
         }
     }
 
@@ -81,5 +189,5 @@ function generateBotResponse(userMessage) {
         }
     }
 
-    return finalResponse;
+    displayMessage(finalResponse);
 }
