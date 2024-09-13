@@ -12,6 +12,7 @@ function fetchSeoulWeather(callback, temperatureOnly = false) {
         "thunderstorm": "천둥번개",
         "snow": "눈",
         "mist": "안개",
+        "overcast clouds" : "흐림",
     };
     const weatherTranslations2 = {
         "clear sky": "🌞",
@@ -23,6 +24,7 @@ function fetchSeoulWeather(callback, temperatureOnly = false) {
         "thunderstorm": "⛈️",
         "snow": "❄️",
         "mist": "🌫️",
+        "overcast clouds" : "☁️",
     };
 
     fetch(apiUrl)
